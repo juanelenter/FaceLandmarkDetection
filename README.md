@@ -8,7 +8,7 @@
 Only achieve good results in controlled environments (frontal face and proper lightning).
 
 ## Established methods.
-- ERT: cascade based on gradient boosting. (available in dlib)
+- ERT: cascade based on gradient boosting. :heavy_check_mark:
 
 In order to run ERT you should download the pretrained model from: https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/ in the "--shape-predictor" section and then extract the ".dat" file to the main folder.
 - MultiTask Cascaded CNN: 
