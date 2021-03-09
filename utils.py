@@ -1,25 +1,22 @@
 import cv2 as cv
 import numpy as np
 
+def find_ellipse(points):
+	"""
+	param points: Points to which an ellipse is fitted.
+	return: Best ellipse in the sense of MSE.
+	"""
+	ellipse = cv.fitEllipse(points)
+	return ellipse
 
-def rect_to_bb(rect):
-	# take a bounding predicted by dlib and convert it
-	# to the format (x, y, w, h) as we would normally do
-	# with OpenCV
-	x = rect.left()
-	y = rect.top()
-	w = rect.right() - x
-	h = rect.bottom() - y
-	# return a tuple of (x, y, w, h)
-	return (x, y, w, h)
-
-
-def shape_to_np(shape, dtype="int"):
-	# initialize the list of (x, y)-coordinates
-	coords = np.zeros((68, 2), dtype=dtype)
-	# loop over the 68 facial landmarks and convert them
-	# to a 2-tuple of (x, y)-coordinates
-	for i in range(0, 68):
-		coords[i] = (shape.part(i).x, shape.part(i).y)
-	# return the list of (x, y)-coordinates
-	return coords
+landmark_map = {
+				"face_contour": np.arange(0, 17),
+				"right_eyebrow": np.arange(17, 22),
+				"left_eyebrow": np.arange(22, 27),
+				"vertical_nose": np.arange(27, 31),
+				"horizontal_nose": np.arange(31, 36),
+				"left_eye": np.arange(36, 42),
+				"right_eye": np.arange(42, 48),
+				"outer_lip": np.arange(48, 60),
+				"inner_lip": np.arange(60, 68)
+				}

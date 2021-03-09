@@ -6,8 +6,15 @@ import dlib
 import cv2
 from imutils.video import VideoStream
 import time
+from utils import find_ellipse, landmark_map
 
-def detector_image(image_path = "images/dinho.jpg"):
+def detector_image(image_path = "images/dinho.jpg", contour_type= "connect_dots"):
+	"""
+	Function that detects landmarks in the faces present in an image.
+	Draws contour to match eyes.
+	image_path: path of image to analyze.
+	contour_type: either "connect_dots" or "ellipse"
+	"""
 
 	detector = dlib.get_frontal_face_detector()
 	predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -26,22 +33,33 @@ def detector_image(image_path = "images/dinho.jpg"):
 		# array
 		shape = predictor(gray, rect)
 		shape = face_utils.shape_to_np(shape)
-		# convert dlib's rectangle to a OpenCV-style bounding box
-		# [i.e., (x, y, w, h)], then draw the face bounding box
-		(x, y, w, h) = face_utils.rect_to_bb(rect)
-		cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-		# show the face number
-		cv2.putText(image, "Face #{}".format(i + 1), (x - 10, y - 10),
-					cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
 		# loop over the (x, y)-coordinates for the facial landmarks
 		# and draw them on the image
 		for (x, y) in shape:
 			cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
+
+		#Draw eyes according to method chosen
+		if contour_type == "ellipse":
+			right_eye = shape[landmark_map["right_eye"]]
+			left_eye = shape[landmark_map["left_eye"]]
+			right_eye = find_ellipse(right_eye)
+			left_eye = find_ellipse(left_eye)
+			cv2.ellipse(image, right_eye, (255, 0, 0), 1)
+			cv2.ellipse(image, left_eye, (255, 0, 0), 1)
+		elif contour_type == "connect_dots":
+			for region in landmark_map:
+				points = shape[landmark_map[region]].reshape((-1, 1, 2))
+				if region in ["face_contour", "right_eyebrow", "left_eyebrow", "horizontal_nose"]:
+					cv2.polylines(frame, [points], False, (255, 0, 0))
+				else:
+					cv2.polylines(frame, [points], True, (255, 0, 0))
+
 	# show the output image with the face detections + facial landmarks
 	cv2.imshow("Output", image)
 	cv2.waitKey(0)
 
-def detector_live():
+def detector_live(draw_contours = True):
 	# initialize dlib's face detector (HOG-based) and then load our
 	# trained shape predictor
 	print("[INFO] loading facial landmark predictor...")
@@ -62,10 +80,7 @@ def detector_live():
 		rects = detector(gray, 0)
 		# loop over the face detections
 		for rect in rects:
-			# convert the dlib rectangle into an OpenCV bounding box and
-			# draw a bounding box surrounding the face
-			(x, y, w, h) = face_utils.rect_to_bb(rect)
-			# cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
 			# use our custom dlib shape predictor to predict the location
 			# of our landmark coordinates, then convert the prediction to
 			# an easily parsable NumPy array
@@ -76,6 +91,13 @@ def detector_live():
 			for (sX, sY) in shape:
 				cv2.circle(frame, (sX, sY), 1, (0, 0, 255), -1)
 				# show the frame
+			if draw_contours:
+				for region in landmark_map:
+					points = shape[landmark_map[region]].reshape((-1, 1, 2))
+					if region in ["face_contour", "right_eyebrow", "left_eyebrow", "horizontal_nose"]:
+						cv2.polylines(frame, [points], False, (255, 0, 0))
+					else:
+						cv2.polylines(frame, [points], True, (255, 0, 0))
 		cv2.imshow("Frame", frame)
 		key = cv2.waitKey(1) & 0xFF
 		# if the `q` key was pressed, break from the loop
@@ -85,6 +107,6 @@ def detector_live():
 	cv2.destroyAllWindows()
 	vs.stop()
 
-
 if __name__ == '__main__':
-	detector_live()
+	#detector_image(image_path="images/cara_juan3.jpg", contour_type= "connect_dots")
+	detector_live(draw_contours = True)
