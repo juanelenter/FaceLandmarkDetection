@@ -47,6 +47,7 @@ def detector_image(image_path = "images/dinho.jpg", contour_type= "connect_dots"
 			left_eye = find_ellipse(left_eye)
 			cv2.ellipse(image, right_eye, (255, 0, 0), 1)
 			cv2.ellipse(image, left_eye, (255, 0, 0), 1)
+
 		elif contour_type == "connect_dots":
 			for region in landmark_map:
 				points = shape[landmark_map[region]].reshape((-1, 1, 2))
@@ -109,4 +110,4 @@ def detector_live(draw_contours = True):
 
 if __name__ == '__main__':
 	#detector_image(image_path="images/cara_juan3.jpg", contour_type= "connect_dots")
-	detector_live(draw_contours = True)
+	detector_live(draw_contours = False)
