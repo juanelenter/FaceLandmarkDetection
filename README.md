@@ -14,7 +14,7 @@ Paper: One Millisecond Face Alignment with an Ensemble of Regression Trees paper
 
 In order to run ERT you should download the pretrained model from: https://www.pyimagesearch.com/2017/04/03/facial-landmarks-dlib-opencv-python/ in the "--shape-predictor" section and then extract the ".dat" file to the main folder.
 
-![image](images/68landmarks.png)
+![landmarks](https://github.com/juanelenter/FaceLandmarkDetection/images/68landmarks.png)
 
 - MultiTask Cascaded CNN: 
 
